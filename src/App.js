@@ -9,42 +9,35 @@ export default function App() {
     const todosRef = useRef();
 
     const addMovie = newMovie => {
-        const lastForm = movies;
-        lastForm.push(newMovie);
-        setMovies([...lastForm]);
-        localStorage.setItem("movies", JSON.stringify(movies));
+        setMovies(prevMovies => [...prevMovies, newMovie]);
         setTimeout(() => {
            todosRef.current.scrollTo(0, todosRef.current.scrollHeight)
         }, 0);
     };
+
     const removeMovie = id => {
-        const lastForm = movies;
-        let foundIndex = movies.findIndex(movie => movie.id === id);
-        if (foundIndex !== -1) {
-            lastForm.splice(foundIndex, 1);
-            setMovies([...lastForm]);
-            localStorage.setItem("movies", JSON.stringify(movies));
-        }
+        const copy = movies.filter(movie => movie.id !== id);
+        setMovies(copy);
     };
+
     const changeStatus = id => {
-        const lastForm = movies;
-        let foundIndex = movies.findIndex(movie => movie.id === id);
-        if (foundIndex !== -1) {
-            lastForm[foundIndex].isWatched = !lastForm[foundIndex].isWatched;
-            setMovies([...lastForm]);
-            localStorage.setItem("movies", JSON.stringify(movies));
+        const copy = [...movies];
+        const found = copy.find(movie => movie.id === id);
+        if (found) {
+            found.isWatched = !found.isWatched;
+            setMovies(copy);
         }
     };
 
     useEffect(() => {
         const moviesFromStorage = localStorage.getItem("movies");
-        if (moviesFromStorage !== null) {
-            setMovies([...JSON.parse(moviesFromStorage)]);
-        } else {
-            localStorage.setItem("movies", JSON.stringify(movies));
-        }
+        if (moviesFromStorage)
+            setMovies(JSON.parse(moviesFromStorage));
     }, []);
 
+    useEffect(() => {
+        localStorage.setItem("movies", JSON.stringify(movies));
+    }, [movies]);
 
 
     return (
